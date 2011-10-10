@@ -51,7 +51,7 @@ token must have been requested with session true"
   [developer-key token]
   (let [r (get-with-token developer-key token session-token-uri)]
     (if (= 200 (:status r))
-      (if-let [[_ token] (re-matches #"Token=(\S+)\n" (:body r))]
+      (if-let [[_ token] (re-matches #"Token=(\S+)\n" (String. (:body r)))]
         token
         (throw (Exception. (print-str r))))
       (throw (Exception. (print-str r))))))
