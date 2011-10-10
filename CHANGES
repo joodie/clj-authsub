@@ -1,4 +1,5 @@
 Changes:
 
+v0.1.2 - fix session token retrieval
 v0.1.1 - don't try to turn response body into String.
 v0.1.0 - initial release
