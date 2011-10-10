@@ -43,7 +43,7 @@ and if she authorizes, next-url is called with the parameter \"token\" appended.
                                  "Authorization" (str "AuthSub token=\"" token "\"")
                                  "X-GData-Key" (str "key=" developer-key)
                                  "GData-Version" "2.1"}})]
-    (update-in resp [:body] #(String. %))))
+    resp))
 
 (defn get-session-token
   "get a long-lived session token from a single-use token. the single-use
