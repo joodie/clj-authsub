@@ -1,7 +1,8 @@
 (ns authsub.core
-   (:require [clj-http.client :as http]
-             [clj-http.core :as http-core])
-   (:import java.net.URLEncoder))
+  (:use authsub.middleware)
+  (:require [clj-http.client :as http]
+            [clj-http.core :as http-core])
+  (:import java.net.URLEncoder))
 
 (defn- enc
   [s]
@@ -16,7 +17,6 @@ and if she authorizes, next-url is called with the parameter \"token\" appended.
   (str "https://www.google.com/accounts/AuthSubRequest?scope=" (enc scope)
        "&session=" (if session 1 0) "&secure=" (if secure 1 0) "&next=" (enc next-url)))
 
-
 (def session-token-uri
   "https://www.google.com/accounts/AuthSubSessionToken")
 
@@ -29,21 +29,13 @@ and if she authorizes, next-url is called with the parameter \"token\" appended.
 (defn get-with-token
   "Get a GData url with a given token and developer-key. returns the full response object"
   [developer-key token url]
-  ;;
-  ;; we set our own Host: header without a port number, since the
-  ;; default client includes the port. That is, it sets "Host:
-  ;; hostname:80" or "hostname:443", and the google data API doesn't
-  ;; like that
-  ;;
-  (let [host (or (second (re-matches #".*?://([^/:]+).*" url))
-                 (throw (Exception. (str "Cannot get host name from url '" url "'"))))
-        resp (request {:request-method :get
-                       :url url
-                       :headers {"Host" host
-                                 "Authorization" (str "AuthSub token=\"" token "\"")
-                                 "X-GData-Key" (str "key=" developer-key)
-                                 "GData-Version" "2.1"}})]
-    resp))
+  ((-> request
+       (wrap-developer-key developer-key)
+       (wrap-token token)
+       wrap-gdata-version
+       wrap-host-fix)
+   {:url url
+    :request-method :get}))
 
 (defn get-session-token
   "get a long-lived session token from a single-use token. the single-use
