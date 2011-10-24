@@ -1,23 +1,27 @@
 (ns authsub.middleware
   "clj-http compatible middleware for AuthSub requests")
 
+(defn- add-header
+  [req header value]
+  (assoc-in req [:headers header] value))
+
 (defn wrap-developer-key
   "Add a Google developer key the request object."
   [f developer-key]
   (fn [request]
-    (assoc-in request [:headers "X-GData-Key"]  (str "key=" developer-key))))
+    (add-header request "X-GData-Key" (str "key=" developer-key))))
 
 (defn wrap-token
   "Add an autentication token to the request object"
   [f token]
   (fn [request]
-    (assoc-in request [:headers "Authorization" (str "AuthSub token=\"" token "\"")])))
+    (add-header request "Authorization" (str "AuthSub token=\"" token "\""))))
 
 (defn wrap-gdata-version
   "Add a GData-Version header to the request. Default version is 2."
   ([f version]
      (fn [request]
-       (assoc-in request [:headers "GData-Version"] version)))
+       (add-header request "GData-Version" version)))
   ([f]
      (wrap-gdata-version f "2")))
 
