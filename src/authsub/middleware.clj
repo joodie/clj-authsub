@@ -9,19 +9,19 @@
   "Add a Google developer key the request object."
   [f developer-key]
   (fn [request]
-    (add-header request "X-GData-Key" (str "key=" developer-key))))
+    (f (add-header request "X-GData-Key" (str "key=" developer-key)))))
 
 (defn wrap-token
   "Add an autentication token to the request object"
   [f token]
   (fn [request]
-    (add-header request "Authorization" (str "AuthSub token=\"" token "\""))))
+    (f (add-header request "Authorization" (str "AuthSub token=\"" token "\"")))))
 
 (defn wrap-gdata-version
   "Add a GData-Version header to the request. Default version is 2."
   ([f version]
      (fn [request]
-       (add-header request "GData-Version" version)))
+       (f (add-header request "GData-Version" version))))
   ([f]
      (wrap-gdata-version f "2")))
 
@@ -38,4 +38,4 @@ Request must contain either a :url or a :server-name"
                      (second (re-matches #"^([^:]+).*" (:server-name request))))
                    (throw (Exception. (str "Cannot get host name from request"))))
           headers (:headers request)]
-      (assoc-in request [:headers "Host"] host))))
+      (f (assoc-in request [:headers "Host"] host)))))
