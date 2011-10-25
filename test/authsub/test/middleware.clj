@@ -3,8 +3,14 @@
         authsub.middleware)
  (:require [clj-http.client :as http]))
 
+(deftest test-pre
+  (is (map? ((-> identity
+                 http/wrap-url)
+             {:url "http://example.com"}))))
+
 (deftest test-middleware
-  (let [mk-req (-> http/wrap-url
+  (let [mk-req (-> identity
+                   http/wrap-url
                    (wrap-developer-key "devkey")
                    (wrap-token "token")
                    wrap-host-fix)
