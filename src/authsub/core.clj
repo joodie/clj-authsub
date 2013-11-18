@@ -20,7 +20,7 @@ and if she authorizes, next-url is called with the parameter \"token\" appended.
 (def session-token-uri
   "https://www.google.com/accounts/AuthSubSessionToken")
 
-(defn token-info-uri
+(def token-info-uri
   "https://www.google.com/accounts/AuthSubTokenInfo")
 
 (def request
